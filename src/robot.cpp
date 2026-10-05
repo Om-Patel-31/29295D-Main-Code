@@ -1,5 +1,8 @@
 #include "robot.h"
+#include "tuning/tuning.h"
 #include <cmath>
+#include <vector>
+#include <algorithm>
 
 vex::brain Brain;
 vex::controller Controller;
@@ -48,47 +51,48 @@ void update_odometry() {
     currentY += deltaHRS; 
 }
 
+// --- Motion Profiles ---
+double get_trig_velocity(double t, double max_vel) {
+    // S-Curve using sine: v(t) = max_vel * (1 - cos(pi * t)) / 2
+    return max_vel * (1.0 - std::cos(M_PI * t)) / 2.0;
+}
+
 void move_to(double targetX, double targetY) {
+    double startTime = vex::timer::systemHighResolution();
+    double duration = 2.0; // Estimated duration for trig ramp
+
     while (true) {
         update_odometry();
+        double elapsed = (vex::timer::systemHighResolution() - startTime) / 1000000.0;
+        double t = std::min(1.0, elapsed / duration);
+        double current_max_vel = get_trig_velocity(t, 60.0);
 
-        // 1. Calculate distance to target
+
         double dx = targetX - currentX;
         double dy = targetY - currentY;
         double distance = std::sqrt(dx*dx + dy*dy);
-        
-        if (distance < 1.5) break; // Target reached (1.5 inch tolerance)
 
-        // 2. Calculate angle to target (relative to field)
+        if (distance < 1.5) break;
+
         double targetAngle = std::atan2(dy, dx);
         double angleError = targetAngle - currentAngle;
-
-        // Normalize angle error to [-PI, PI]
         while (angleError > PI) angleError -= 2 * PI;
         while (angleError < -PI) angleError += 2 * PI;
 
-        // 3. Drive Logic
         if (std::abs(angleError) > 0.1) {
-            // Turn towards target
-            double turnSpeed = 50.0 * angleError; // Simple P-loop
-            // Use explicit casting to directionType if available or simple spin(dir)
-            // Since we are having trouble with the Enum, we will use the most basic spin(dir) 
-            // and then set voltage separately if needed, but the SDK allows spin(dir, voltage, units)
-            // Let's try the most compatible VEX way:
+            double turnSpeed = 50.0 * angleError;
             LFM.spin(vex::forward, turnSpeed, vex::voltageUnits::volt);
             LBM.spin(vex::forward, turnSpeed, vex::voltageUnits::volt);
             RFM.spin(vex::reverse, turnSpeed, vex::voltageUnits::volt);
             RBM.spin(vex::reverse, turnSpeed, vex::voltageUnits::volt);
         } else {
-            // Drive forward
-            LFM.spin(vex::forward, 60, vex::voltageUnits::volt);
-            LBM.spin(vex::forward, 60, vex::voltageUnits::volt);
-            RFM.spin(vex::forward, 60, vex::voltageUnits::volt);
-            RBM.spin(vex::forward, 60, vex::voltageUnits::volt);
+            LFM.spin(vex::forward, current_max_vel, vex::voltageUnits::volt);
+            LBM.spin(vex::forward, current_max_vel, vex::voltageUnits::volt);
+            RFM.spin(vex::forward, current_max_vel, vex::voltageUnits::volt);
+            RBM.spin(vex::forward, current_max_vel, vex::voltageUnits::volt);
         }
-        
         vex::task::sleep(20);
     }
-    
     LFM.stop(); LBM.stop(); RFM.stop(); RBM.stop();
 }
+
