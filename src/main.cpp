@@ -1,54 +1,69 @@
+#include "robot.h"
+#include "variables.h"
 #include "vex.h"
-#include "include/robot.h"
-using namespace vex;
+#include <cmath>
 
-competition Competition;
+using namespace	vex;
 
-void pre_auton(void) {
+competition		Competition;
 
-}
-
-
-void autonomous(void) {
-	
-}
-
-//driver functions
-void cubicDrive(float input) 
+void	pre_auton(void)
 {
-	float normalized = input / 100.0f;
-	
-	if (std::fabs(normalized) < (driver_tuning.deadzone / 100.0f)) return 0.0;
-	
-	return normalized ** driver_tuning.response_exponent * 100.0f;
+	initialize_robot(); // calibrates the IMU and zeroes the tracking wheels
 }
 
-void usercontrol(void) {
+void	autonomous(void)
+{
+}
+
+// Driver response curve: deadzone, then a power curve that keeps the sign.
+// Input and output are both -100..100.
+float	cubicDrive(float input)
+{
+	float	normalized;
+	float	sign;
+
+	normalized = input / 100.0f;
+	if (std::fabs(normalized) < (driver_tuning.deadzone / 100.0f))
+		return (0.0f);
+	sign = (normalized < 0.0f) ? -1.0f : 1.0f;
+	return (sign * std::pow(std::fabs(normalized),
+			driver_tuning.response_exponent) * 100.0f);
+}
+
+void	usercontrol(void)
+{
+	float	drive;
+	float	turn;
+	float	left;
+	float	right;
+
 	while (true)
 	{
-		float drive = Controller.Axis3.position();
-		float turn = Controller.Axis2.position();
-		
+		drive = Controller.Axis3.position();
+		turn = Controller.Axis1.position();
 		drive = cubicDrive(drive);
 		turn = cubicDrive(turn);
-		
-		float left = forward + turn;
-		float right = forward - turn;
-		
+		left = drive + turn;
+		right = drive - turn;
 		LFM.spin(vex::fwd, left, vex::pct);
 		LBM.spin(vex::fwd, left, vex::pct);
-		RFM.spin(vex::fwd, left, vex::pct);
-		RBM.spin(vex::fwd, left, vex::pct);
-		
-		vex::wait(0.1, vex::msec);
+		RFM.spin(vex::fwd, right, vex::pct);
+		RBM.spin(vex::fwd, right, vex::pct);
+		vex::wait(10, vex::msec);
 	}
 }
 
-
-int main() {
+int	main(void)
+{
 	Competition.autonomous(autonomous);
 	Competition.drivercontrol(usercontrol);
 
 	pre_auton();
 
+	// Keep the program alive so the competition callbacks keep running.
+	while (true)
+	{
+		vex::wait(100, vex::msec);
+	}
 }
