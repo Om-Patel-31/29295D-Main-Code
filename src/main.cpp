@@ -1,69 +1,93 @@
-#include "robot.h"
-#include "variables.h"
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       om31d                                                     */
+/*    Created:      10/2/2026, 8:48:40 PM                                     */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+
 #include "vex.h"
-#include <cmath>
 
-using namespace	vex;
+using namespace vex;
 
-competition		Competition;
+// A global instance of competition
+competition Competition;
 
-void	pre_auton(void)
-{
-	initialize_robot(); // calibrates the IMU and zeroes the tracking wheels
+// define your global instances of motors and other devices here
+
+/*---------------------------------------------------------------------------*/
+/*                          Pre-Autonomous Functions                         */
+/*                                                                           */
+/*  You may want to perform some actions before the competition starts.      */
+/*  Do them in the following function.  You must return from this function   */
+/*  or the autonomous and usercontrol tasks will not be started.  This       */
+/*  function is only called once after the V5 has been powered on and        */
+/*  not every time that the robot is disabled.                               */
+/*---------------------------------------------------------------------------*/
+
+void pre_auton(void) {
+
+  // All activities that occur before the competition starts
+  // Example: clearing encoders, setting servo positions, ...
 }
 
-void	autonomous(void)
-{
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              Autonomous Task                              */
+/*                                                                           */
+/*  This task is used to control your robot during the autonomous phase of   */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+
+void autonomous(void) {
+  // ..........................................................................
+  // Insert autonomous user code here.
+  // ..........................................................................
 }
 
-// Driver response curve: deadzone, then a power curve that keeps the sign.
-// Input and output are both -100..100.
-float	cubicDrive(float input)
-{
-	float	normalized;
-	float	sign;
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              User Control Task                            */
+/*                                                                           */
+/*  This task is used to control your robot during the user control phase of */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
 
-	normalized = input / 100.0f;
-	if (std::fabs(normalized) < (driver_tuning.deadzone / 100.0f))
-		return (0.0f);
-	sign = (normalized < 0.0f) ? -1.0f : 1.0f;
-	return (sign * std::pow(std::fabs(normalized),
-			driver_tuning.response_exponent) * 100.0f);
+void usercontrol(void) {
+  // User control code here, inside the loop
+  while (1) {
+    // This is the main execution loop for the user control program.
+    // Each time through the loop your program should update motor + servo
+    // values based on feedback from the joysticks.
+
+    // ........................................................................
+    // Insert user code here. This is where you use the joystick values to
+    // update your motors, etc.
+    // ........................................................................
+
+    wait(20, msec); // Sleep the task for a short amount of time to
+                    // prevent wasted resources.
+  }
 }
 
-void	usercontrol(void)
-{
-	float	drive;
-	float	turn;
-	float	left;
-	float	right;
+//
+// Main will set up the competition functions and callbacks.
+//
+int main() {
+  // Set up callbacks for autonomous and driver control periods.
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 
-	while (true)
-	{
-		drive = Controller.Axis3.position();
-		turn = Controller.Axis1.position();
-		drive = cubicDrive(drive);
-		turn = cubicDrive(turn);
-		left = drive + turn;
-		right = drive - turn;
-		LFM.spin(vex::fwd, left, vex::pct);
-		LBM.spin(vex::fwd, left, vex::pct);
-		RFM.spin(vex::fwd, right, vex::pct);
-		RBM.spin(vex::fwd, right, vex::pct);
-		vex::wait(10, vex::msec);
-	}
-}
+  // Run the pre-autonomous function.
+  pre_auton();
 
-int	main(void)
-{
-	Competition.autonomous(autonomous);
-	Competition.drivercontrol(usercontrol);
-
-	pre_auton();
-
-	// Keep the program alive so the competition callbacks keep running.
-	while (true)
-	{
-		vex::wait(100, vex::msec);
-	}
+  // Prevent main from exiting with an infinite loop.
+  while (true) {
+    wait(100, msec);
+  }
 }
