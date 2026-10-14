@@ -1,15 +1,16 @@
-# VEXcode mkenv.mk 2022_06_26_01
+# VEX toolchain environment. It selects the V5 SDK, compiler, linker, and
+# platform-specific command behavior; it does not contain robot control logic.
 
 # macros to help with paths that include spaces
 sp = $() $()
 qs = $(subst ?, ,$1)
 sq = $(subst $(sp),?,$1)
 
-# default platform and build location
+# Default VEX platform and generated-object directory.
 PLATFORM  = vexv5
 BUILD     = build
 
-# version for clang headers
+# The SDK's Clang header version must match the installed SDK layout.
 ifneq ("$(origin HEADERS)", "command line")
 HEADERS = 8.0.0
 endif
@@ -26,7 +27,7 @@ ifneq (1,$(words $(PROJECT)))
 $(error Project name cannot contain whitespace: $(PROJECT))
 endif
 
-# SDK path passed from app
+# T overrides the SDK root; otherwise HOME/sdk is used.
 # if not set then environmental variabled used
 ifeq ("$(origin T)", "command line")
 VEX_SDK_PATH = $(T)
@@ -39,7 +40,7 @@ ifeq ("$(origin PRINTF_FLOAT)", "command line")
 PRINTF_FLAG = -u_printf_float
 endif
 
-# Verbose flag passed from app
+# V=1 removes command hiding so compile and link commands are printed.
 ifeq ("$(origin V)", "command line")
 BUILD_VERBOSE=$(V)
 endif
@@ -58,7 +59,7 @@ else
 Q =
 endif
 
-# compile and link tools
+# Tool names expected on PATH for a successful VEX build.
 CC      = clang
 CXX     = clang
 OBJCOPY = arm-none-eabi-objcopy
@@ -84,24 +85,25 @@ RMDIR = rm -rf
 CLEAN = $(RMDIR) $(BUILD) 2> /dev/null || :
 endif
 
-# toolchain include and lib locations
+# Include and library search paths are derived from the selected SDK root.
 TOOL_INC  = -I"$(VEX_SDK_PATH)/$(PLATFORM)/clang/$(HEADERS)/include" -I"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/include/c++/4.9.3"  -I"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/include/c++/4.9.3/arm-none-eabi/armv7-ar/thumb" -I"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/include"
 TOOL_LIB  = -L"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/libs"
 
-# compiler flags
+# ARM target, C++11, warning, exception, and section-generation options.
 CFLAGS_CL = -target thumbv7-none-eabi -fshort-enums -Wno-unknown-attributes -U__INT32_TYPE__ -U__UINT32_TYPE__ -D__INT32_TYPE__=long -D__UINT32_TYPE__='unsigned long' 
 CFLAGS_V7 = -march=armv7-a -mfpu=neon -mfloat-abi=softfp
 CFLAGS    = ${CFLAGS_CL} ${CFLAGS_V7} -Os -Wall -Werror=return-type -ansi -std=gnu99 $(DEFINES)
 CXX_FLAGS = ${CFLAGS_CL} ${CFLAGS_V7} -Os -Wall -Werror=return-type -fno-rtti -fno-threadsafe-statics -fno-exceptions  -std=gnu++11 -ffunction-sections -fdata-sections $(DEFINES)
 
-# linker flags
+# Link against the V5 linker script and runtime libraries with dead sections
+# removed from the final ELF.
 LNK_FLAGS = -nostdlib -T "$(VEX_SDK_PATH)/$(PLATFORM)/lscript.ld" -R "$(VEX_SDK_PATH)/$(PLATFORM)/stdlib_0.lib" -Map="$(BUILD)/$(PROJECT).map" --gc-section -L"$(VEX_SDK_PATH)/$(PLATFORM)" ${TOOL_LIB}
 
 # future statuc library
 PROJECTLIB = lib$(PROJECT)
 ARCH_FLAGS = rcs
 
-# libraries
+# Runtime libraries supplied by the VEX SDK and ARM toolchain.
 LIBS =  --start-group -lv5rt -lstdc++ -lc -lm -lgcc --end-group
 
 # include file paths
