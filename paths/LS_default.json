@@ -1,0 +1,46 @@
+{
+  "name": "Left Side Match Auton",
+  "routine": "LS",
+  "waypoints": [
+    {
+      "x": 48.0,
+      "y": 18.0,
+      "heading": 0.0,
+      "motion_type": "bdrive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 48.0,
+      "y": 30.0,
+      "heading": 0.0,
+      "motion_type": "drive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 48.0,
+      "y": 30.0,
+      "heading": 270.0,
+      "motion_type": "turn",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 36.0,
+      "y": 42.0,
+      "heading": 270.0,
+      "motion_type": "bdrive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "sdrive",
+      "wait_ms": 0
+    }
+  ]
+}

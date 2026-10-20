@@ -1,0 +1,46 @@
+{
+  "name": "Right Side Match Auton",
+  "routine": "RS",
+  "waypoints": [
+    {
+      "x": 96.0,
+      "y": 18.0,
+      "heading": 0.0,
+      "motion_type": "bdrive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 96.0,
+      "y": 30.0,
+      "heading": 0.0,
+      "motion_type": "drive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 96.0,
+      "y": 30.0,
+      "heading": 90.0,
+      "motion_type": "turn",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 108.0,
+      "y": 42.0,
+      "heading": 90.0,
+      "motion_type": "bdrive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "sdrive",
+      "wait_ms": 0
+    }
+  ]
+}

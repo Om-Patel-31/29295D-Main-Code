@@ -1,0 +1,106 @@
+{
+  "name": "Programming Skills 60s",
+  "routine": "Skills",
+  "waypoints": [
+    {
+      "x": 72.0,
+      "y": 24.0,
+      "heading": 0.0,
+      "motion_type": "drive",
+      "speed": 70.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 72.0,
+      "y": 10.0,
+      "heading": 0.0,
+      "motion_type": "drive",
+      "speed": 70.0,
+      "reverse": true,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 72.0,
+      "y": 18.0,
+      "heading": 0.0,
+      "motion_type": "drive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 72.0,
+      "y": 18.0,
+      "heading": 90.0,
+      "motion_type": "turn",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 46.0,
+      "y": 18.0,
+      "heading": 90.0,
+      "motion_type": "drive",
+      "speed": 75.0,
+      "reverse": true,
+      "action": "clamp_claw",
+      "wait_ms": 200
+    },
+    {
+      "x": 46.0,
+      "y": 48.0,
+      "heading": 0.0,
+      "motion_type": "bdrive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 82.0,
+      "y": 66.0,
+      "heading": 90.0,
+      "motion_type": "bdrive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 102.0,
+      "y": 66.0,
+      "heading": 90.0,
+      "motion_type": "drive",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 102.0,
+      "y": 66.0,
+      "heading": 180.0,
+      "motion_type": "turn",
+      "speed": 100.0,
+      "reverse": false,
+      "action": "none",
+      "wait_ms": 0
+    },
+    {
+      "x": 102.0,
+      "y": 50.0,
+      "heading": 180.0,
+      "motion_type": "drive",
+      "speed": 60.0,
+      "reverse": true,
+      "action": "sdrive",
+      "wait_ms": 0
+    }
+  ]
+}
